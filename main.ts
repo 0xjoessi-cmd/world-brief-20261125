@@ -8,7 +8,7 @@ const pixels = Buffer.alloc(W * H * 4);
 let clip = null;
 const C = { paper:'#F4F0E6', ink:'#17232C', muted:'#46535B', red:'#C74432', blue:'#315D73', gold:'#D4A53D', pale:'#E6E0D2', white:'#FFFDF7', green:'#59765D' };
 function rgba(hex) { const n=parseInt(hex.slice(1),16); return [(n>>16)&255,(n>>8)&255,n&255,255]; }
-function rect(x,y,w,h,color) { const c=rgba(color), left=Math.max(0,x,clip?clip.x:0), top=Math.max(0,y,clip?clip.y:0), right=Math.min(W,x+w,clip?clip.x+clip.w:W), bottom=Math.min(H,y+h,clip?clip.y+clip.h:H); for(let yy=top;yy<bottom;yy++) for(let xx=left;xx<right;xx++){const i=(yy*W+xx)*4; pixels[i]=c[0];pixels[i+1]=c[1];pixels[i+2]=c[2];pixels[i+3]=255;} }
+function rect(x,y,w,h,color) { x=Math.round(x);y=Math.round(y);w=Math.round(w);h=Math.round(h);if(clip)clip={x:Math.round(clip.x),y:Math.round(clip.y),w:Math.round(clip.w),h:Math.round(clip.h)};const c=rgba(color), left=Math.max(0,x,clip?clip.x:0), top=Math.max(0,y,clip?clip.y:0), right=Math.min(W,x+w,clip?clip.x+clip.w:W), bottom=Math.min(H,y+h,clip?clip.y+clip.h:H); for(let yy=top;yy<bottom;yy++) for(let xx=left;xx<right;xx++){const i=(yy*W+xx)*4; pixels[i]=c[0];pixels[i+1]=c[1];pixels[i+2]=c[2];pixels[i+3]=255;} }
 function line(x1,y1,x2,y2,color,thick=2) { let dx=Math.abs(x2-x1), sx=x1<x2?1:-1, dy=-Math.abs(y2-y1), sy=y1<y2?1:-1, err=dx+dy; for(;;){rect(x1-thick/2,y1-thick/2,thick,thick,color);if(x1===x2&&y1===y2)break;const e=2*err;if(e>=dy){err+=dy;x1+=sx;}if(e<=dx){err+=dx;y1+=sy;}} }
 function circle(cx,cy,r,color,fill=true) { for(let y=-r;y<=r;y++)for(let x=-r;x<=r;x++){const d=x*x+y*y;if(fill?d<=r*r:Math.abs(d-r*r)<r*2)rect(cx+x,cy+y,1,1,color);} }
 const font={
